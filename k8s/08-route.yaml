@@ -1,0 +1,14 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: task-manager-frontend
+  namespace: default
+spec:
+  host: task-manager.apps-crc.testing
+  port:
+    targetPort: http
+  to:
+    kind: Service
+    name: frontend-service
+    weight: 100
+  wildcardPolicy: None

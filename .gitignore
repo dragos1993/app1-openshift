@@ -1,0 +1,58 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+dist/
+build/
+*.o
+*.a
+*.so
+
+# Docker
+docker-compose.override.yml
+.dockerignore
+
+# Database
+*.sql.bak
+backup*.sql
+*.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Kubernetes local config
+kubeconfig
+.kube/
+
+# Secrets (don't commit!)
+*.secret
+*.key
+*.pem
+
+# CRC specific
+crc-*
+.crc/

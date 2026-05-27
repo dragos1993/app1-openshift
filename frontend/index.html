@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 500px;
+        }
+
+        /* Login Form Styles */
+        .login-container {
+            padding: 40px;
+            display: none;
+        }
+
+        .login-container.active {
+            display: block;
+        }
+
+        .login-container h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .error {
+            color: #e74c3c;
+            text-align: center;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        /* Dashboard Styles */
+        .dashboard-container {
+            padding: 40px;
+            display: none;
+        }
+
+        .dashboard-container.active {
+            display: block;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .dashboard-header h1 {
+            color: #333;
+            font-size: 24px;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-info p {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .logout-btn {
+            background: #e74c3c;
+            padding: 8px 15px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+
+        .task-form {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+
+        .task-form h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .form-group-inline {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .form-group-inline input {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .add-task-btn {
+            background: #27ae60;
+            padding: 12px 20px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .add-task-btn:hover {
+            background: #229954;
+        }
+
+        .tasks-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .task-item {
+            background: #f0f0f0;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-content p {
+            color: #333;
+            margin: 5px 0;
+        }
+
+        .task-title {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .task-date {
+            color: #999;
+            font-size: 12px;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+
+        .empty-tasks {
+            text-align: center;
+            color: #999;
+            padding: 20px;
+        }
+
+        .loading {
+            text-align: center;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Container -->
+    <div class="login-container active" id="loginContainer">
+        <h1>📋 Task Manager</h1>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required placeholder="Enter your username">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required placeholder="Enter your password">
+            </div>
+            <button type="submit" class="btn">Login</button>
+            <div class="error" id="loginError"></div>
+        </form>
+    </div>
+
+    <!-- Dashboard Container -->
+    <div class="dashboard-container" id="dashboardContainer">
+        <div class="dashboard-header">
+            <h1>📋 My Tasks</h1>
+            <div class="user-info">
+                <p>Logged in as: <strong id="currentUser"></strong></p>
+                <button class="logout-btn" id="logoutBtn">Logout</button>
+            </div>
+        </div>
+
+        <div class="task-form">
+            <h2>Add New Task</h2>
+            <form id="taskForm">
+                <div class="form-group-inline">
+                    <input type="text" id="taskName" name="taskName" placeholder="What do you need to do today?" required>
+                    <button type="submit" class="add-task-btn">Add Task</button>
+                </div>
+                <div class="error" id="taskError"></div>
+            </form>
+        </div>
+
+        <div class="tasks-list" id="tasksList">
+            <div class="empty-tasks">No tasks yet. Add one to get started!</div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = '/api';
+        let currentUser = null;
+
+        // DOM Elements
+        const loginContainer = document.getElementById('loginContainer');
+        const dashboardContainer = document.getElementById('dashboardContainer');
+        const loginForm = document.getElementById('loginForm');
+        const taskForm = document.getElementById('taskForm');
+        const tasksList = document.getElementById('tasksList');
+        const currentUserSpan = document.getElementById('currentUser');
+        const loginError = document.getElementById('loginError');
+        const taskError = document.getElementById('taskError');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        // Check if user is already logged in
+        async function checkAuth() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/me`, {
+                    credentials: 'include'
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    currentUser = data.username;
+                    showDashboard();
+                    loadTasks();
+                } else {
+                    showLogin();
+                }
+            } catch (error) {
+                console.log('Not authenticated');
+                showLogin();
+            }
+        }
+
+        // Login handler
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                loginError.textContent = '';
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password }),
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    currentUser = username;
+                    loginForm.reset();
+                    showDashboard();
+                    loadTasks();
+                } else {
+                    const error = await response.json();
+                    loginError.textContent = error.message || 'Login failed';
+                    loginError.classList.add('show');
+                }
+            } catch (error) {
+                loginError.textContent = 'Error connecting to server';
+                loginError.classList.add('show');
+                console.error('Login error:', error);
+            }
+        });
+
+        // Task form handler
+        taskForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const taskName = document.getElementById('taskName').value;
+
+            try {
+                taskError.textContent = '';
+                const response = await fetch(`${API_BASE_URL}/tasks`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name: taskName }),
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    document.getElementById('taskName').value = '';
+                    loadTasks();
+                } else {
+                    const error = await response.json();
+                    taskError.textContent = error.message || 'Failed to add task';
+                    taskError.classList.add('show');
+                }
+            } catch (error) {
+                taskError.textContent = 'Error connecting to server';
+                taskError.classList.add('show');
+                console.error('Task creation error:', error);
+            }
+        });
+
+        // Load tasks
+        async function loadTasks() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/tasks`, {
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    const tasks = await response.json();
+                    displayTasks(tasks);
+                }
+            } catch (error) {
+                console.error('Error loading tasks:', error);
+            }
+        }
+
+        // Display tasks
+        function displayTasks(tasks) {
+            if (tasks.length === 0) {
+                tasksList.innerHTML = '<div class="empty-tasks">No tasks yet. Add one to get started!</div>';
+                return;
+            }
+
+            tasksList.innerHTML = tasks.map(task => `
+                <div class="task-item">
+                    <div class="task-content">
+                        <p class="task-title">${escapeHtml(task.name)}</p>
+                        <p class="task-date">Added: ${new Date(task.created_at).toLocaleDateString()}</p>
+                    </div>
+                    <button class="delete-btn" onclick="deleteTask(${task.id})">Delete</button>
+                </div>
+            `).join('');
+        }
+
+        // Delete task
+        async function deleteTask(taskId) {
+            if (!confirm('Are you sure you want to delete this task?')) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/tasks/${taskId}`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    loadTasks();
+                }
+            } catch (error) {
+                console.error('Error deleting task:', error);
+            }
+        }
+
+        // Logout handler
+        logoutBtn.addEventListener('click', async () => {
+            try {
+                await fetch(`${API_BASE_URL}/auth/logout`, {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                currentUser = null;
+                showLogin();
+                loginForm.reset();
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        });
+
+        // Show/Hide containers
+        function showLogin() {
+            loginContainer.classList.add('active');
+            dashboardContainer.classList.remove('active');
+        }
+
+        function showDashboard() {
+            loginContainer.classList.remove('active');
+            dashboardContainer.classList.add('active');
+            currentUserSpan.textContent = currentUser;
+        }
+
+        // Utility to escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Initialize
+        checkAuth();
+        setInterval(loadTasks, 5000); // Refresh tasks every 5 seconds
+    </script>
+</body>
+</html>
