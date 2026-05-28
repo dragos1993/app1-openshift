@@ -9,8 +9,18 @@ require('dotenv').config();
 const app = express();
 
 // Middleware
+const allowedOrigins = [
+  'http://task-manager.apps-crc.testing',
+  'https://task-manager.apps-crc.testing'
+];
+
 app.use(cors({
-  origin: '*',
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
   methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type']
