@@ -121,3 +121,34 @@ Your CRC OpenShift application is now publicly accessible at:
 Code
 https://www.ro-store.com
 via Cloudflare Tunnel, with full HTTPS, no port forwarding, and no public IP required.
+
+
+FINAL
+
+redhat@localhost:~/.cloudflared$ ls -l
+total 16
+-r--------. 1 redhat redhat 175 May 29 00:35 1f3c6714-f219-40eb-aaf6-a70025b9b716.json
+-rw-------. 1 redhat redhat 282 May 29 00:30 cert.pem
+-rw-r--r--. 1 redhat redhat 447 May 29 00:42 config.yml
+-rw-r--r--. 1 redhat redhat 246 May 28 22:17 config.yml.bak
+
+redhat@localhost:~/.cloudflared$ cat config.yml
+tunnel: 1f3c6714-f219-40eb-aaf6-a70025b9b716
+credentials-file: /home/redhat/.cloudflared/1f3c6714-f219-40eb-aaf6-a70025b9b716.json
+
+ingress:
+  - hostname: ro-store.com
+    service: http://task-manager.apps-crc.testing
+    originRequest:
+      httpHostHeader: www.ro-store.com
+
+  - hostname: www.ro-store.com
+    service: http://task-manager.apps-crc.testing
+    originRequest:
+      httpHostHeader: www.ro-store.com
+
+  - service: http_status:404
+
+
+cloudflared tunnel route dns taskmanager www.ro-store.com
+cloudflared tunnel run taskmanager
