@@ -34,10 +34,10 @@ Example:
 Code
 ~/.cloudflared/4670d8c5-fcdb-4453-93d6-970102d86ef6.json
 4. Create DNS Route for Your Domain
-To expose the root domain (https://ro-store.com):
+To expose the public domain (https://www.ro-store.com):
 
 sh
-cloudflared tunnel route dns taskmanager ro-store.com
+cloudflared tunnel route dns taskmanager www.ro-store.com
 Cloudflare automatically creates a CNAME pointing to the tunnel.
 
 5. Create the Cloudflare Tunnel Configuration
@@ -52,7 +52,7 @@ tunnel: taskmanager
 credentials-file: /home/redhat/.cloudflared/4670d8c5-fcdb-4453-93d6-970102d86ef6.json
 
 ingress:
-  - hostname: ro-store.com
+  - hostname: www.ro-store.com
     service: http://task-manager.apps-crc.testing
   - service: http_status:404
 Replace the credentials file name with your actual JSON file.
@@ -83,7 +83,7 @@ Set:
 
 yaml
 spec:
-  host: ro-store.com
+  host: www.ro-store.com
 Save and exit.
 
 8. Start the Cloudflare Tunnel
@@ -97,17 +97,17 @@ Registered tunnel connection
 9. Test the Setup
 Test OpenShift router locally:
 sh
-curl -H "Host: ro-store.com" http://router-default.apps-crc.testing
+curl -H "Host: www.ro-store.com" http://router-default.apps-crc.testing
 You should receive your frontend HTML or a 404 from your app.
 
 Test public domain:
 Code
-https://ro-store.com
+https://www.ro-store.com
 Your application should now be publicly accessible.
 
-10. Optional: Add www.ro-store.com
+10. Optional: Add root domain
 sh
-cloudflared tunnel route dns taskmanager www.ro-store.com
+cloudflared tunnel route dns taskmanager ro-store.com
 Update config.yml:
 
 yaml
@@ -119,5 +119,5 @@ Final Result
 Your CRC OpenShift application is now publicly accessible at:
 
 Code
-https://ro-store.com
+https://www.ro-store.com
 via Cloudflare Tunnel, with full HTTPS, no port forwarding, and no public IP required.

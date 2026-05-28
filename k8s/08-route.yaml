@@ -4,7 +4,7 @@ metadata:
   name: task-manager-frontend
   namespace: app1
 spec:
-  host: task-manager.apps-crc.testing
+  host: www.ro-store.com
   path: /
   port:
     targetPort: http
@@ -20,7 +20,7 @@ metadata:
   name: task-manager-backend
   namespace: app1
 spec:
-  host: task-manager.apps-crc.testing
+  host: www.ro-store.com
   path: /api
   port:
     targetPort: http

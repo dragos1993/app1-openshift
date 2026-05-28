@@ -11,7 +11,11 @@ const app = express();
 // Middleware
 const allowedOrigins = [
   'http://task-manager.apps-crc.testing',
-  'https://task-manager.apps-crc.testing'
+  'https://task-manager.apps-crc.testing',
+  'http://ro-store.com',
+  'https://ro-store.com',
+  'http://www.ro-store.com',
+  'https://www.ro-store.com'
 ];
 
 app.use(cors({
