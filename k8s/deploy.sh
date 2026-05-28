@@ -13,7 +13,7 @@ echo -e "${YELLOW}Starting deployment of Task Manager Application...${NC}"
 # Function to check if pod is ready
 check_pod_ready() {
     local pod_name=$1
-    local namespace=${2:-default}
+    local namespace=${2:-app1}
     
     echo "Waiting for $pod_name to be ready..."
     kubectl wait --for=condition=ready pod \
@@ -27,11 +27,14 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$SCRIPT_DIR"
 
 # Apply manifests
-echo -e "${YELLOW}1. Applying ConfigMaps and Secrets...${NC}"
+echo -e "${YELLOW}1. Creating namespace...${NC}"
+kubectl apply -f 00-namespace.yaml
+
+echo -e "${YELLOW}2. Applying ConfigMaps and Secrets...${NC}"
 kubectl apply -f 02-configmap-secret.yaml
 kubectl apply -f 05-postgres-init-configmap.yaml
 
-echo -e "${YELLOW}2. Applying PersistentVolume and PersistentVolumeClaim...${NC}"
+echo -e "${YELLOW}3. Applying PersistentVolume and PersistentVolumeClaim...${NC}"
 kubectl apply -f 01-pv-pvc.yaml
 
 echo -e "${YELLOW}3. Deploying PostgreSQL...${NC}"

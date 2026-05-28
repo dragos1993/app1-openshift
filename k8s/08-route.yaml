@@ -2,7 +2,7 @@ apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
   name: task-manager-frontend
-  namespace: default
+  namespace: app1
 spec:
   host: task-manager.apps-crc.testing
   port:
@@ -10,5 +10,21 @@ spec:
   to:
     kind: Service
     name: frontend-service
+    weight: 100
+  wildcardPolicy: None
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: task-manager-backend
+  namespace: app1
+spec:
+  host: task-manager.apps-crc.testing
+  path: /api
+  port:
+    targetPort: http
+  to:
+    kind: Service
+    name: backend-service
     weight: 100
   wildcardPolicy: None
