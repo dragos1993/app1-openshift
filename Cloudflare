@@ -1,0 +1,123 @@
+Exposing an OpenShift CRC Application Publicly Using Cloudflare Tunnel + Custom Domain
+This guide documents the complete process for exposing an application running on OpenShift CRC to the public internet using Cloudflare Tunnel and a custom domain (e.g., ro-store.com).
+It includes Cloudflare setup, DNS configuration, tunnel creation, OpenShift route updates, and CRC DNS fixes.
+
+1. Prerequisites
+A running CRC (CodeReady Containers) cluster
+
+An application deployed in OpenShift with a working Route
+
+A Cloudflare account
+
+A domain added to Cloudflare (e.g., ro-store.com)
+
+cloudflared installed on the same machine where CRC runs
+
+Basic knowledge of OpenShift (oc CLI)
+
+2. Install and Authenticate Cloudflared
+Install cloudflared and authenticate it with Cloudflare:
+
+sh
+cloudflared tunnel login
+A browser window opens → log in and authorize Cloudflare.
+
+3. Create a Cloudflare Tunnel
+sh
+cloudflared tunnel create taskmanager
+This generates a credentials file in:
+
+Code
+~/.cloudflared/<UUID>.json
+Example:
+
+Code
+~/.cloudflared/4670d8c5-fcdb-4453-93d6-970102d86ef6.json
+4. Create DNS Route for Your Domain
+To expose the root domain (https://ro-store.com):
+
+sh
+cloudflared tunnel route dns taskmanager ro-store.com
+Cloudflare automatically creates a CNAME pointing to the tunnel.
+
+5. Create the Cloudflare Tunnel Configuration
+Create the config file:
+
+sh
+nano ~/.cloudflared/config.yml
+Add:
+
+yaml
+tunnel: taskmanager
+credentials-file: /home/redhat/.cloudflared/4670d8c5-fcdb-4453-93d6-970102d86ef6.json
+
+ingress:
+  - hostname: ro-store.com
+    service: http://task-manager.apps-crc.testing
+  - service: http_status:404
+Replace the credentials file name with your actual JSON file.
+
+6. Fix CRC DNS Resolution (Critical Step)
+CRC inside a VM resolves all OpenShift routes to 127.0.0.1.
+Cloudflared must be able to reach the OpenShift router.
+
+Edit /etc/hosts:
+
+sh
+sudo nano /etc/hosts
+Add:
+
+Code
+127.0.0.1 router-default.apps-crc.testing
+127.0.0.1 task-manager.apps-crc.testing
+This ensures Cloudflare Tunnel can reach the OpenShift router.
+
+7. Update the OpenShift Route to Use Your Domain
+Your OpenShift Route must match the Cloudflare hostname.
+
+Edit the route:
+
+sh
+oc edit route task-manager-frontend -n app1
+Set:
+
+yaml
+spec:
+  host: ro-store.com
+Save and exit.
+
+8. Start the Cloudflare Tunnel
+sh
+cloudflared tunnel run taskmanager
+You should see:
+
+Code
+Connected to Cloudflare
+Registered tunnel connection
+9. Test the Setup
+Test OpenShift router locally:
+sh
+curl -H "Host: ro-store.com" http://router-default.apps-crc.testing
+You should receive your frontend HTML or a 404 from your app.
+
+Test public domain:
+Code
+https://ro-store.com
+Your application should now be publicly accessible.
+
+10. Optional: Add www.ro-store.com
+sh
+cloudflared tunnel route dns taskmanager www.ro-store.com
+Update config.yml:
+
+yaml
+  - hostname: www.ro-store.com
+    service: http://task-manager.apps-crc.testing
+Restart the tunnel.
+
+Final Result
+Your CRC OpenShift application is now publicly accessible at:
+
+Code
+https://ro-store.com
+via Cloudflare Tunnel, with full HTTPS, no port forwarding, and no public IP required.
