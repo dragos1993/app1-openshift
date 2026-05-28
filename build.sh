@@ -10,7 +10,7 @@ set -e
 
 echo -e "${YELLOW}Building Docker images for Task Manager Application...${NC}"
 
-REGISTRY="${1:-localhost:5000}"
+REGISTRY="${1:-docker.io/dragos93}"
 echo "Using registry: $REGISTRY"
 
 # Change to project root

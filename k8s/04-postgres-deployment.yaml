@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: postgres
-        image: postgres:15-alpine
+        image: docker.io/dragos93/app1-postgres:latest
         imagePullPolicy: IfNotPresent
         ports:
         - name: postgres

@@ -1,4 +1,4 @@
-FROM postgres:15-alpine
+FROM docker.io/library/postgres:15-alpine
 
 # Set environment variables
 ENV POSTGRES_USER=postgres
