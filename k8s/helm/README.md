@@ -31,7 +31,7 @@ The chart supports:
 
 If you want Argo CD to manage this chart, use the ApplicationSet manifest from `k8s/argocd-applicationset.yaml`.
 
-The ApplicationSet deploys the chart from a Git repo path of `services/helm` and automatically syncs when `values.yml` changes.
+The ApplicationSet deploys the chart from a Git repo path of `k8s/helm` and automatically syncs when `values.yaml` changes.
 
 ## Notes
 
