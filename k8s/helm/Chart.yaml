@@ -1,0 +1,7 @@
+apiVersion: v2
+name: app1
+description: Helm chart for the app1 OpenShift stack
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+kubeVersion: ">=1.20.0"

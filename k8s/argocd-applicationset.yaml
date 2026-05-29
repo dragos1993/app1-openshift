@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: app1-helm-appset
+  namespace: argocd
+spec:
+  generators:
+    - git:
+        repoURL: https://github.com/dragos1993/app1-openshift-argocd.git
+        revision: main
+        directories:
+          - path: services/helm
+  template:
+    metadata:
+      name: app1-helm
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/dragos1993/app1-openshift-argocd.git
+        targetRevision: main
+        path: services/helm
+        helm:
+          valueFiles:
+            - values.yml
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: app1
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+      syncOptions:
+        - CreateNamespace=true
