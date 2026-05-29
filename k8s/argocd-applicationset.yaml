@@ -9,7 +9,7 @@ spec:
         repoURL: https://github.com/dragos1993/app1-openshift-argocd.git
         revision: main
         directories:
-          - path: services/helm
+          - path: k8s/helm
   template:
     metadata:
       name: app1-helm
@@ -18,10 +18,10 @@ spec:
       source:
         repoURL: https://github.com/dragos1993/app1-openshift-argocd.git
         targetRevision: main
-        path: services/helm
+        path: k8s/helm
         helm:
           valueFiles:
-            - values.yml
+            - values.yaml
       destination:
         server: https://kubernetes.default.svc
         namespace: app1
